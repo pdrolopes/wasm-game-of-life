@@ -1,6 +1,7 @@
 mod utils;
 
 use std::fmt;
+use js_sys::Math::random;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -25,20 +26,42 @@ pub struct Universe {
 }
 
 #[wasm_bindgen]
-impl Universe {
+    impl Universe {
     pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 100;
+        let height = 100;
 
         let cells = (0..width * height)
-            .map(|i| {
-                if i % 2 == 0 || i % 7 == 0 {
+            .map(|_| {
+                let r = random();
+                if r < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
                 }
             })
             .collect();
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+    pub fn new_spaceship() -> Universe {
+        let width : u32 = 100;
+        let height : u32 = 100;
+
+        let mut cells : Vec<Cell>  = (0..width * height)
+            .map(|_|  Cell::Dead )
+            .collect();
+        // cells[0] = Cell::Alive;
+        cells[1] = Cell::Alive;
+        // cells[(width + 0) as usize] = Cell::Alive;
+        cells[(width + 2) as usize] = Cell::Alive;
+        cells[((width * 2) + 0) as usize] = Cell::Alive;
+        cells[((width * 2) + 1) as usize] = Cell::Alive;
+        cells[((width * 2) + 2) as usize] = Cell::Alive;
 
         Universe {
             width,
