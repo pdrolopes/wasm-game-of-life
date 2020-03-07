@@ -26,7 +26,7 @@ pub struct Universe {
 }
 
 #[wasm_bindgen]
-    impl Universe {
+impl Universe {
     pub fn new() -> Universe {
         let width = 100;
         let height = 100;
@@ -49,25 +49,27 @@ pub struct Universe {
         }
     }
     pub fn new_spaceship() -> Universe {
-        let width : u32 = 100;
-        let height : u32 = 100;
+        let width : u32 = 64;
+        let height : u32 = 64;
 
-        let mut cells : Vec<Cell>  = (0..width * height)
+        let cells : Vec<Cell>  = (0..width * height)
             .map(|_|  Cell::Dead )
             .collect();
-        // cells[0] = Cell::Alive;
-        cells[1] = Cell::Alive;
-        // cells[(width + 0) as usize] = Cell::Alive;
-        cells[(width + 2) as usize] = Cell::Alive;
-        cells[((width * 2) + 0) as usize] = Cell::Alive;
-        cells[((width * 2) + 1) as usize] = Cell::Alive;
-        cells[((width * 2) + 2) as usize] = Cell::Alive;
+        let spaceship = [
+            (1, 2),
+            (2, 3),
+            (3, 1),
+            (3, 2),
+            (3, 3),
+        ];
 
-        Universe {
+        let mut universe = Universe {
             width,
             height,
             cells,
-        }
+        };
+        universe.set_cells(&spaceship);
+        universe
     }
 
     pub fn render(&self) -> String {
@@ -137,6 +139,25 @@ pub struct Universe {
         }
 
         self.cells = next;
+    }
+    pub fn set_width(&mut self, width: u32)  {
+        self.width = width;
+        self.cells = (0..width * self.height).map(|_| Cell::Dead).collect();
+    }
+    pub fn set_height(&mut self, height: u32) {
+        self.height = height;
+        self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
+    }
+}
+impl Universe {
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        for (row, col) in cells {
+            let idx = self.get_index(*row, *col);
+            self.cells[idx] = Cell::Alive;
+        }
     }
 }
 
