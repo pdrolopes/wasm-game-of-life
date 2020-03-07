@@ -6,7 +6,7 @@ const GRID_COLOR= "#CCCCCC";
 const DEAD_COLOR= "#FFFFFF";
 const ALIVE_COLOR="#000000";
 
-let universe = Universe.new_spaceship();
+let universe = Universe.new();
 const width = universe.width();
 const height = universe.height();
 
@@ -91,7 +91,34 @@ playPauseButton.addEventListener("click", event => {
     pause();
   }
 });
+const glider = [
+  [0, 0],
+  [0, 2],
+  [1, 1],
+  [1, 2],
+  [2, 1],
+]
+const pulsar = [
+  [-1, -2],
+  [-1, -3],
+  [-1, -4],
+  [-2, -6],
+  [-3, -6],
+  [-4, -6],
+].reduce((acc, [x,y]) => {
+  acc.push([x,y])
+  acc.push([-x,y])
+  acc.push([x,-y])
+  acc.push([-x,-y])
+  acc.push([y,x])
+  acc.push([-y,x])
+  acc.push([y,-x])
+  acc.push([-y,-x])
+  return acc;
+}, [])
+
 canvas.addEventListener("click", event => {
+  const { metaKey, shiftKey } = event
   const boundingRect = canvas.getBoundingClientRect();
 
   const scaleX = canvas.width / boundingRect.width;
@@ -103,10 +130,17 @@ canvas.addEventListener("click", event => {
   const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
   const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
 
-  universe.toggle_cell(row, col);
+  if (metaKey) {
+    glider.forEach(([r, c]) => universe.toggle_cell(row + r, col + c))
+  } else if(shiftKey) {
+    pulsar.forEach(([r, c]) => universe.toggle_cell(row + r, col + c))
+  } else {
+    universe.toggle_cell(row, col);
+  }
 
   drawGrid();
   drawCells();
+  return true
 });
 rangeInput.addEventListener("change", event => {
   const { value } = event.target
@@ -115,9 +149,13 @@ rangeInput.addEventListener("change", event => {
 })
 randomButton.addEventListener("click", () => {
   universe = Universe.random()
+  drawGrid();
+  drawCells();
 })
-clearButton.addEventListener("click", () => {
+clearButton.addEventListener("click", (event) => {
   universe = Universe.new()
+  drawGrid();
+  drawCells();
 })
 
 

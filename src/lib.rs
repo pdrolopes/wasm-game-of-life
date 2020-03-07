@@ -81,6 +81,8 @@ impl Universe {
     }
 
     fn get_index(&self, row: u32, column: u32) -> usize {
+        let row = row % self.width;
+        let column = column % self.height;
         (row * self.width + column) as usize
     }
 
