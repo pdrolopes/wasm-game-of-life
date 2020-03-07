@@ -37,39 +37,30 @@ pub struct Universe {
 impl Universe {
     pub fn new() -> Universe {
         utils::set_panic_hook();
-        let width = 100;
-        let height = 100;
+        let width = 64;
+        let height = 64;
 
-        let cells = (0..width * height)
-            .map(|_| {
-                let r = random();
-                if r < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
-
+        let cells: Vec<Cell> = (0..width * height).map(|_| Cell::Dead).collect();
         Universe {
             width,
             height,
             cells,
         }
     }
+    pub fn random() -> Universe {
+        let mut universe = Universe::new();
+        for cell in &mut universe.cells {
+            let r = random();
+            if r < 0.5 {
+                cell.toggle();
+            }
+        }
+
+        universe
+    }
     pub fn new_spaceship() -> Universe {
-        utils::set_panic_hook();
-        let width: u32 = 64;
-        let height: u32 = 64;
-
-        let cells: Vec<Cell> = (0..width * height).map(|_| Cell::Dead).collect();
+        let mut universe = Universe::new();
         let spaceship = [(1, 2), (2, 3), (3, 1), (3, 2), (3, 3)];
-
-        let mut universe = Universe {
-            width,
-            height,
-            cells,
-        };
         universe.set_cells(&spaceship);
         universe
     }
@@ -150,7 +141,7 @@ impl Universe {
         self.height = height;
         self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
     }
-    pub fn toggle_cell(&mut self, row: u32, column: u32)  {
+    pub fn toggle_cell(&mut self, row: u32, column: u32) {
         let idx = self.get_index(row, column);
         self.cells[idx].toggle();
     }

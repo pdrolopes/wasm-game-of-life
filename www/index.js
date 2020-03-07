@@ -6,14 +6,18 @@ const GRID_COLOR= "#CCCCCC";
 const DEAD_COLOR= "#FFFFFF";
 const ALIVE_COLOR="#000000";
 
-const universe = Universe.new_spaceship();
+let universe = Universe.new_spaceship();
 const width = universe.width();
 const height = universe.height();
 
 const canvas = document.getElementById("game-of-life-canvas");
+const rangeInput = document.getElementById("toggle-range");
+const randomButton = document.getElementById("random");
+const clearButton = document.getElementById("clear");
 canvas.height = (CELL_SIZE + 1) * height + 1;
 canvas.width = (CELL_SIZE +1) * width + 1;
 let animationId = null;
+let ticketPerAnimation = 1;
 
 const ctx = canvas.getContext('2d');
 
@@ -104,15 +108,28 @@ canvas.addEventListener("click", event => {
   drawGrid();
   drawCells();
 });
+rangeInput.addEventListener("change", event => {
+  const { value } = event.target
+  console.log("Tick per animation ", value)
+  ticketPerAnimation = value
+})
+randomButton.addEventListener("click", () => {
+  universe = Universe.random()
+})
+clearButton.addEventListener("click", () => {
+  universe = Universe.new()
+})
 
 
 
 
 const renderLoop = () => {
-  universe.tick();
+  for (let i=1; i <= ticketPerAnimation; i++)
+    universe.tick();
   drawGrid();
   drawCells();
 
   animationId = requestAnimationFrame(renderLoop);
 }
-pause();
+play()
+pause()
