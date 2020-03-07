@@ -7,7 +7,7 @@ const GRID_COLOR= "#CCCCCC";
 const DEAD_COLOR= "#FFFFFF";
 const ALIVE_COLOR="#000000";
 
-let universe = Universe.new();
+let universe = Universe.random();
 const width = universe.width();
 const height = universe.height();
 
@@ -18,7 +18,7 @@ const clearButton = document.getElementById("clear");
 canvas.height = (CELL_SIZE + 1) * height + 1;
 canvas.width = (CELL_SIZE +1) * width + 1;
 let animationId = null;
-let ticketPerAnimation = 1;
+let tickPerFrame = 9;
 
 const ctx = canvas.getContext('2d');
 
@@ -52,13 +52,31 @@ const drawCells = () => {
 
   ctx.beginPath();
 
+  ctx.fillStyle = ALIVE_COLOR;
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const idx = getIndex(row, col);
+      if (cells[idx] !== Cell.Alive) {
+        continue;
+      }
 
-      ctx.fillStyle = cells[idx] === Cell.Dead
-        ? DEAD_COLOR
-        : ALIVE_COLOR;
+      ctx.fillRect(
+        col * (CELL_SIZE + 1) + 1,
+        row * (CELL_SIZE + 1) + 1,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+    }
+  }
+
+  // Dead cells.
+  ctx.fillStyle = DEAD_COLOR;
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      const idx = getIndex(row, col);
+      if (cells[idx] !== Cell.Dead) {
+        continue;
+      }
 
       ctx.fillRect(
         col * (CELL_SIZE + 1) + 1,
@@ -146,7 +164,7 @@ canvas.addEventListener("click", event => {
 rangeInput.addEventListener("change", event => {
   const { value } = event.target
   console.log("Tick per animation ", value)
-  ticketPerAnimation = value
+  tickPerFrame = value
 })
 randomButton.addEventListener("click", () => {
   universe = Universe.random()
@@ -162,7 +180,7 @@ clearButton.addEventListener("click", (event) => {
 const fps = new Fps(document.getElementById("fps"))
 const renderLoop = () => {
   fps.render()
-  for (let i=1; i <= ticketPerAnimation; i++)
+  for (let i=1; i <= tickPerFrame; i++)
     universe.tick();
   drawGrid();
   drawCells();
@@ -170,4 +188,3 @@ const renderLoop = () => {
   animationId = requestAnimationFrame(renderLoop);
 }
 play()
-pause()
