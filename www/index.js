@@ -1,5 +1,6 @@
 import { Universe, Cell } from "wasm-game-of-life";
 import { memory } from "wasm-game-of-life/wasm_game_of_life_bg";
+import Fps from "./fps"
 
 const CELL_SIZE = 5;
 const GRID_COLOR= "#CCCCCC";
@@ -158,10 +159,9 @@ clearButton.addEventListener("click", (event) => {
   drawCells();
 })
 
-
-
-
+const fps = new Fps(document.getElementById("fps"))
 const renderLoop = () => {
+  fps.render()
   for (let i=1; i <= ticketPerAnimation; i++)
     universe.tick();
   drawGrid();
