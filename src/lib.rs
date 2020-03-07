@@ -1,7 +1,7 @@
 mod utils;
 
-use std::fmt;
 use js_sys::Math::random;
+use std::fmt;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -17,6 +17,14 @@ pub enum Cell {
     Dead = 0,
     Alive = 1,
 }
+impl Cell {
+    fn toggle(&mut self) {
+        *self = match self {
+            Cell::Alive => Cell::Dead,
+            Cell::Dead => Cell::Alive,
+        };
+    }
+}
 
 #[wasm_bindgen]
 pub struct Universe {
@@ -28,6 +36,7 @@ pub struct Universe {
 #[wasm_bindgen]
 impl Universe {
     pub fn new() -> Universe {
+        utils::set_panic_hook();
         let width = 100;
         let height = 100;
 
@@ -49,19 +58,12 @@ impl Universe {
         }
     }
     pub fn new_spaceship() -> Universe {
-        let width : u32 = 64;
-        let height : u32 = 64;
+        utils::set_panic_hook();
+        let width: u32 = 64;
+        let height: u32 = 64;
 
-        let cells : Vec<Cell>  = (0..width * height)
-            .map(|_|  Cell::Dead )
-            .collect();
-        let spaceship = [
-            (1, 2),
-            (2, 3),
-            (3, 1),
-            (3, 2),
-            (3, 3),
-        ];
+        let cells: Vec<Cell> = (0..width * height).map(|_| Cell::Dead).collect();
+        let spaceship = [(1, 2), (2, 3), (3, 1), (3, 2), (3, 3)];
 
         let mut universe = Universe {
             width,
@@ -140,13 +142,17 @@ impl Universe {
 
         self.cells = next;
     }
-    pub fn set_width(&mut self, width: u32)  {
+    pub fn set_width(&mut self, width: u32) {
         self.width = width;
         self.cells = (0..width * self.height).map(|_| Cell::Dead).collect();
     }
     pub fn set_height(&mut self, height: u32) {
         self.height = height;
         self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
+    }
+    pub fn toggle_cell(&mut self, row: u32, column: u32)  {
+        let idx = self.get_index(row, column);
+        self.cells[idx].toggle();
     }
 }
 impl Universe {
